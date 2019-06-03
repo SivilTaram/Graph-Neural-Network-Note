@@ -114,8 +114,6 @@ $$L𝑜𝑠𝑠=∑_{𝑖=1}^𝑝{(𝐭_𝑖−𝐨_𝑖)}$$
 
 ## 参考文献
 
-而且，$f$ 不是压缩映射会对图神经网络有什么影响吗，这里并看不出来？这两点疑惑我们稍后再谈，我们下面先来谈谈GNN是如何学习的。
-
 
 [1]. A Comprehensive Survey on Graph Neural Networks, https://arxiv.org/abs/1901.00596
 
