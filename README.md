@@ -251,12 +251,17 @@ GGNN目前得到了广泛的应用，相比于GNN，其最大的区别在于不�
 
 ## 图卷积框架(Framework)
 
-上面说了图卷积的核心特征，下面我们先来一窥图卷积神经网络的全貌。
+上面说了图卷积的核心特征，下面我们先来一窥图卷积神经网络的全貌。如下图所示，输入的是整张图，在`Convolution Layer 1`里，对每个结点的邻居都进行一次卷积操作，并用卷积的结果更新该结点；然后经过激活函数如`ReLU`，然后再过一层卷积层`Convolution Layer 2`与一词激活函数；反复上述过程，直到层数达到预期深度。与GNN类似，图卷积神经网络也有一个局部输出函数，用于将结点的状态(包括隐藏状态与结点特征)转换成任务相关的标签，比如水军账号分类，本文中笔者称这种任务为`Node-Level`的任务；也有一些任务是对整张图进行分类的，比如化合物分类，本文中笔者称这种任务为`Graph-Level`的任务。**卷积操作关心每个结点的隐藏状态如何更新**，而对于`Graph-Level`的任务，它们会在卷积层后加入更多操作。本篇博客主要关心如何在图上做卷积，至于如何从结点信息得到整张图的表示，我们将在下一篇系列博客中讲述。
 
 ![图卷积神经网络全貌](https://raw.githubusercontent.com/SivilTaram/Graph-Neural-Network-Note/master/images/image-10-gcn-framework.png)
 
+多说一句，GCN与GNN乍看好像还挺像的。为了不让读者误解，在这里我们澄清一下它们根本上的不同：GCN是多层堆叠，比如上图中的`Layer 1`和`Layer 2`的参数是不同的；GNN是迭代求解，可以看作每一层Layer参数是共享的。
 
 ## 卷积(Convolution)
+
+正如我们在上篇博客的开头说到的，图卷积神经网络主要有两类，一类是基于**空域**的，另一类则是基于**频域**的。通俗点解释，空域可以类比到直接在图片的像素点上进行卷积，而频域可以类比到对图片进行傅里叶变换后，再进行卷积。傅里叶变换的概念我们先按下不讲，我们先对两类方法的代表模型做个大概介绍。
+
+基于空域卷积的方法直接将卷积操作定义在每个结点的连接关系上，它跟传统的卷积神经网络中的卷积更相似一些。在这个类别中比较有代表性的方法有 Message Passing Neural Networks(MPNN)[1], GraphSage[2], Diffusion Convolution Neural Networks(DCNN)[3], PATCHY-SAN[4]等。
 
 ### 基础概念
 
@@ -268,6 +273,15 @@ GGNN目前得到了广泛的应用，相比于GNN，其最大的区别在于不�
 
 ## 参考文献
 
+[1]. Neural Message Passing for Quantum Chemistry, https://arxiv.org/abs/1704.01212
+
+[2]. Inductive Representation Learning on Large Graphs, https://arxiv.org/abs/1706.02216
+
+[3]. Diffusion-Convolutional Neural Networks, https://arxiv.org/abs/1511.02136
+
+[4]. Learning Convolutional Neural Networks for Graphs, https://arxiv.org/pdf/1605.05273
+
+[5]. 
 <!-- ---
 
 在上篇博客中我们仔细介绍了
