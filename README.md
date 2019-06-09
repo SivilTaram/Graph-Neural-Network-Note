@@ -203,6 +203,23 @@ GGNN目前得到了广泛的应用，相比于GNN，其最大的区别在于不�
 
 ## 图卷积神经网络(Graph Convolutional Network)
 
+在本文的开始，我们曾简单介绍过
+
+### 框架(Framework)
+
+### 重新认识卷积(Convolution)
+
+### 空域卷积(Spatial Convolution)
+
+### 频域卷积(Spectral Convolution)
+
+## 图特征聚合(ReadOut)
+
+## 图采样(Graph Sampling)
+
+### 异步更新
+
+### 邻居采样
 
 ## 参考文献
 
