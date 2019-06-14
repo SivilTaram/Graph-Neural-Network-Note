@@ -287,7 +287,7 @@ $$(f*g)(t)={\sum}_{\tau=-\infty}^{\infty}f(\tau)g(t-\tau) (离散形式)$$
 
 ![卷积基本概念](https://raw.githubusercontent.com/SivilTaram/Graph-Neural-Network-Note/master/images/image-11-convolution-basic.png)
 
-如果稍微扩展一点，比如说我们认为 $f(0)$ 或者 $g(0)$ 等是可以取到的，只是它们的值为0而已。那么该公式可以写成$\sum_{\tau=-\infty}^{\infty}f(\tau)g(4-\tau)$。仔细观察，这其实就是卷积$(f*g)(4)$。如果将它写成内积的形式，卷积其实就是 $[f(-\infty),\cdots,f(1),\cdots,f(\infty)] \cdot [g(\infty),\cdots,g(3),\cdot,g(-\infty)]$。这么一看，是不是就对卷积的名字理解更深刻了呢? 所谓卷积，其实就是把一个函数卷(翻)过来，然后与另一个函数求内积。
+如果稍微扩展一点，比如说我们认为 $f(0)$ 或者 $g(0)$ 等是可以取到的，只是它们的值为0而已。那么该公式可以写成$\sum_{\tau=-\infty}^{\infty}f(\tau)g(4-\tau)$。仔细观察，这其实就是卷积$(f*g)(4)$。如果将它写成内积的形式，卷积其实就是 $[f(-\infty),\cdots,f(1),\cdots,f(\infty)] \cdot [g(\infty),\cdots,g(3),\cdots,g(-\infty)]$。这么一看，是不是就对卷积的名字理解更深刻了呢? 所谓卷积，其实就是把一个函数卷(翻)过来，然后与另一个函数求内积。
 
 对应到不同方面，卷积可以有不同的解释：$g$ 既可以看作我们在深度学习里常说的**核**(Kernel)，也可以对应到信号处理中的**滤波器**(Filter)。而 $f$ 可以是我们所说的机器学习中的**特征**(Feature)，也可以是信号处理中的**信号**(Signal)。f和g的卷积 $(f*g)$就可以看作是对$f$的加权求和。下面两个动图就分别对应信号处理与深度学习中卷积操作的过程[9][10]。
 
