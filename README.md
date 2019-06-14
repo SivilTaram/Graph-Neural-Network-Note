@@ -263,9 +263,37 @@ GGNN目前得到了广泛的应用，相比于GNN，其最大的区别在于不�
 
 基于空域卷积的方法直接将卷积操作定义在每个结点的连接关系上，它跟传统的卷积神经网络中的卷积更相似一些。在这个类别中比较有代表性的方法有 Message Passing Neural Networks(MPNN)[1], GraphSage[2], Diffusion Convolution Neural Networks(DCNN)[3], PATCHY-SAN[4]等。
 
+基于频域卷积的方法则从图信号处理起家，包括 Spectral CNN[5], Cheybyshev Spectral CNN(ChebNet)[6], 和 First order of ChebNet(1stChebNet)[7]等。
+
+在介绍这些具体的模型前，先让我们从不同的角度来回顾一下卷积的概念，重新思考一下卷积的本质。
+
 ### 基础概念
 
+由维基百科的介绍我们可以得知，**卷积**是一种定义在两个函数($f$跟$g$)上的数学操作，旨在产生一个新的函数。那么$f$和$g$的卷积就可以写成$f*g$，数学定义如下：
+
+$$(f*g)(t)={\int}_{-\inf}^{\inf}f(\tau)g(t-\tau) (连续形式)$$
+$$(f*g)(t)={\sum}_{\tau=-\inf}^{\inf}f(\tau)g(t-\tau) (离散形式)$$
+
 ### 实例:掷骰子问题
+
+光看数学定义可能会觉得非常抽象，下面我们举一个掷骰子的问题，该实例参考了知乎问题"如何通俗易懂地解释卷积"[8]的回答。
+
+想象我们现在有两个骰子，两个骰子分别是$f$跟$g$，$f(1)$表示骰子$f$向上一面为数字$1$的概率。同时抛掷这两个骰子1次，它们正面朝上数字和为4的概率是多少呢？相信读者很快就能想出它包含了三种情况，分别是：
+- $f$ 向上为1，$g$ 向上为3；
+- $f$ 向上为2，$g$ 向上为2；
+- $f$ 向上为3，$g$ 向上为1；
+
+最后这三种情况出现的概率和即问题的答案，如果写成公式，就是 $\sum_{\tau=1}^{3}f(\tau)g(4-\tau)$。可以形象地绘制成下图：
+
+![卷积基本概念](https://raw.githubusercontent.com/SivilTaram/Graph-Neural-Network-Note/master/images/image-11-convolution-basic.png)
+
+如果稍微扩展一点，比如说我们认为 $f(0)$ 或者 $g(0)$ 等是可以取到的，只是它们的值为0而已。那么该公式可以写成$\sum_{\tau=-\inf}^{\inf}f(\tau)g(4-\tau)$。仔细观察，这其实就是卷积$(f*g)(4)$。如果将它写成内积的形式，卷积其实就是 $[f(-\inf),\cdots,f(1),\cdots,f(\inf)] \cdot [g(\inf),\cdots,g(3),\cdot,g(-\inf)]$。这么一看，是不是就对卷积的名字理解更深刻了呢? **卷积卷积，就是把一个函数卷(翻)过来，然后与另一个函数求一个内积**。
+
+这里的 $g$ 就可以看作我们在深度学习里常说的**核**(Kernel)，也可以对应到信号处理中的**滤波器**(Filter)。那么 $f$ 其实就是我们常提的**特征**(Feature)或**信号**(Signal)。f和g的卷积 $(f*g)$就可以看作是对$f$的加权求和。下面两个动图就分别对应信号处理与深度学习中卷积操作的过程[9][10]。
+
+![信号处理中的卷积](https://raw.githubusercontent.com/SivilTaram/Graph-Neural-Network-Note/master/images/image-12-conv-signal.gif)
+
+![深度学习中的卷积](https://raw.githubusercontent.com/SivilTaram/Graph-Neural-Network-Note/master/images/image-13-conv-cnn.gif)
 
 ## 空域卷积(Spatial Convolution)
 
@@ -282,6 +310,16 @@ GGNN目前得到了广泛的应用，相比于GNN，其最大的区别在于不�
 [4]. Learning Convolutional Neural Networks for Graphs, https://arxiv.org/pdf/1605.05273
 
 [5]. 
+
+[6].
+
+[7].
+
+[8]. 如何通俗易懂地解释卷积, https://www.zhihu.com/question/22298352
+
+[9]. https://en.wikipedia.org/wiki/Convolution
+
+[10]. https://mlnotebook.github.io/post/CNN1/
 <!-- ---
 
 在上篇博客中我们仔细介绍了
