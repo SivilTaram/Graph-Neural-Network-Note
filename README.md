@@ -1,6 +1,6 @@
 # 从图(Graph)到图卷积(Graph Convolution): 漫谈图神经网络
 
-*Github Markdown 对 Latex 的支持不好，推荐移步[本人博客](https://www.cnblogs.com/SivilTaram/p/graph_neural_network.html)阅读，之后会同步更新。*
+*Github Markdown 对 Latex 的支持不好，推荐移步[本人博客](https://www.cnblogs.com/SivilTaram/p/graph_neural_network_1.html)阅读，之后会同步更新。*
 
 笔者最近看了一些图与图卷积神经网络的论文，深感其强大，但一些Survey或教程默认了读者对图神经网络背景知识的了解，对未学过信号处理的读者不太友好。同时，很多教程只讲是什么，不讲为什么，也没有梳理清楚不同网络结构的区别与设计初衷(Motivation)。
 
