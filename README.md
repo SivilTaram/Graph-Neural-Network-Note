@@ -297,6 +297,31 @@ $$(f*g)(t)={\sum}_{\tau=-\infty}^{\infty}f(\tau)g(t-\tau) (离散形式)$$
 
 ## 空域卷积(Spatial Convolution)
 
+介绍完卷积的基础概念后，我们先来介绍下**空域卷积**(Spatial Convolution)。从设计理念上看，空域卷积与深度学习中的卷积的应用方式类似，其核心在于**聚合邻居结点的信息**。比如说，一种最简单的无参卷积方式可以是：将所有直连邻居结点的隐藏状态加和，来更新当前结点的隐藏状态。
+
+![最简单的空域卷积](https://raw.githubusercontent.com/SivilTaram/Graph-Neural-Network-Note/master/images/image-12-basic-spatial-conv.png)
+
+> 这里非参式的卷积只是为了举一个简单易懂的例子，实际上图卷积在建模时需要的都是带参数、可学习的卷积核。
+
+### 消息传递网络(Message Passing Neural Network)
+
+消息传递网络(MPNN)[1] 是由Google的科学家提出的一种模型。严格意义上讲，MPNN是一种框架，它将在空域卷积模型统一成两个过程：**消息传递**与**状态更新**操作，分别由$M_{l}(\cdot)$和$U_{l}(\cdot)$函数完成。将结点$v$的特征$\mathbf{x}_v$作为其隐藏状态的初始态$\mathbf{h}_{v}^0$后，状态更新可以由如下公式表示：
+
+$$\mathbf{h}_{v}^{l+1}=U_{l+1}(\mathbf{h}_v,\sum_{u{\in}ne[v]}M_{l+1}(\mathbf{h}_v^l,\mathbf{h}_u^l,\mathbf{x}_{vu}))$$
+
+其中$l$代表图卷积的第$l$层，上式的物理意义是：收到来自邻居的消息$M$后，图中的每个结点状态更新的方式。
+
+如果读者还记得GGNN的话，可能会觉得这个公式与GGNN的公式很像。实际上，它们是截然不同的两种方式：GCN中通过级联的层捕捉邻居的消息，GNN通过级联的时间来捕捉邻居的消息；前者层与层之间的参数不同，后者可以视作层与层之间共享参数。MPNN的示意图如下[11]：
+
+![MPNN网络模型](https://raw.githubusercontent.com/SivilTaram/Graph-Neural-Network-Note/master/images/image-13-mpnn.png)
+
+### 图采样与聚合(Graph Sample and Aggregate)
+
+MPNN很好地概括了空域卷积的基本模型，但它每次训练时都必须将整个图作为输入，这对很多实际场景来说是不现实的。GraphSage[2]提出的动机之一就是解决这个问题，从它的名字也能看出来，它只需要**采样**(Sample)就可以学习，而不需要将整张图作为输入。虽然不再需要整张图同时输入，GraphSage仍然需要聚合邻居结点的信息，它定义了*aggregate*的操作，类似于MPNN中的消息传递。最终，GraphSage的状态更新公式如下：
+
+$$\mathbf{h}_{v}^{l+1}=\sigma(\mathbf{W}^{l+1}(\mathbf{h}_v^l,\{\mathbf{h}_u^l\}),{\forall}u{\in}ne[v])$$
+
+
 ## 频域卷积(Spectral Convolution)
 
 ## 参考文献
@@ -320,6 +345,8 @@ $$(f*g)(t)={\sum}_{\tau=-\infty}^{\infty}f(\tau)g(t-\tau) (离散形式)$$
 [9]. https://en.wikipedia.org/wiki/Convolution
 
 [10]. https://mlnotebook.github.io/post/CNN1/
+
+[11]. http://snap.stanford.edu/proj/embeddings-www
 <!-- ---
 
 在上篇博客中我们仔细介绍了
