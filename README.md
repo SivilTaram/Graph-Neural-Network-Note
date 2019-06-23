@@ -305,11 +305,11 @@ $$(f*g)(t)={\sum}_{\tau=-\infty}^{\infty}f(\tau)g(t-\tau) (离散形式)$$
 
 ### 消息传递网络(Message Passing Neural Network)
 
-消息传递网络(MPNN)[1] 是由Google的科学家提出的一种模型。严格意义上讲，MPNN是一种框架，它将在空域卷积模型统一成两个过程：**消息传递**与**状态更新**操作，分别由$M_{l}(\cdot)$和$U_{l}(\cdot)$函数完成。将结点$v$的特征$\mathbf{x}_v$作为其隐藏状态的初始态$\mathbf{h}_{v}^0$后，状态更新可以由如下公式表示：
+消息传递网络(MPNN)[1] 是由Google科学家提出的一种模型。严格意义上讲，MPNN不是一种具体的模型，而是一种空域卷积的形式化框架。它将空域卷积分解为两个过程：**消息传递**与**状态更新**操作，分别由$M_{l}(\cdot)$和$U_{l}(\cdot)$函数完成。将结点$v$的特征$\mathbf{x}_v$作为其隐藏状态的初始态$\mathbf{h}_{v}^0$后，空域卷积对隐藏状态的更新由如下公式表示：
 
 $$\mathbf{h}_{v}^{l+1}=U_{l+1}(\mathbf{h}_v,\sum_{u{\in}ne[v]}M_{l+1}(\mathbf{h}_v^l,\mathbf{h}_u^l,\mathbf{x}_{vu}))$$
 
-其中$l$代表图卷积的第$l$层，上式的物理意义是：收到来自邻居的消息$M$后，图中的每个结点状态更新的方式。
+其中$l$代表图卷积的第$l$层，上式的物理意义是：收到来自每个邻居的的消息$M_{l+1}$后，每个结点如何更新自己的状态。
 
 如果读者还记得GGNN的话，可能会觉得这个公式与GGNN的公式很像。实际上，它们是截然不同的两种方式：GCN中通过级联的层捕捉邻居的消息，GNN通过级联的时间来捕捉邻居的消息；前者层与层之间的参数不同，后者可以视作层与层之间共享参数。MPNN的示意图如下[11]：
 
@@ -317,9 +317,9 @@ $$\mathbf{h}_{v}^{l+1}=U_{l+1}(\mathbf{h}_v,\sum_{u{\in}ne[v]}M_{l+1}(\mathbf{h}
 
 ### 图采样与聚合(Graph Sample and Aggregate)
 
-MPNN很好地概括了空域卷积的基本模型，但它每次训练时都必须将整个图作为输入，这对很多实际场景来说是不现实的。GraphSage[2]提出的动机之一就是解决这个问题，从它的名字也能看出来，它只需要**采样**(Sample)就可以学习，而不需要将整张图作为输入。虽然不再需要整张图同时输入，GraphSage仍然需要聚合邻居结点的信息，它定义了*aggregate*的操作，类似于MPNN中的消息传递。最终，GraphSage的状态更新公式如下：
+MPNN很好地概括了空域卷积的过程，但定义在这个框架下的所有模型都有一个共同的缺陷：空域卷积的输入是整张图，也就意味着要将所有结点放入内存中，才能进行在图上的卷积操作。对许多实际场景中应用的大规模的图而言，这样的操作并不现实。GraphSage[2]提出的动机之一就是解决这个问题。从该方法的名字我们也能看出，区别于传统的整图卷积，GraphSage使用**采样**(Sample)部分结点进行学习。当然，即使不需要整张图同时卷积，GraphSage仍然需要聚合邻居结点的信息，即论文中定义的*aggregate*的操作。这种操作类似于MPNN中的**消息传递**过程。最终，GraphSage的状态更新公式如下：
 
-$$\mathbf{h}_{v}^{l+1}=\sigma(\mathbf{W}^{l+1}(\mathbf{h}_v^l,\{\mathbf{h}_u^l\}),{\forall}u{\in}ne[v])$$
+$$\mathbf{h}_{v}^{l+1}=\sigma(\mathbf{W}^{l+1}\cdot(\mathbf{h}_v^l,\{\mathbf{h}_u^l\}),{\forall}u{\in}ne[v])$$
 
 
 ## 频域卷积(Spectral Convolution)
@@ -334,11 +334,11 @@ $$\mathbf{h}_{v}^{l+1}=\sigma(\mathbf{W}^{l+1}(\mathbf{h}_v^l,\{\mathbf{h}_u^l\}
 
 [4]. Learning Convolutional Neural Networks for Graphs, https://arxiv.org/pdf/1605.05273
 
-[5]. 
+[5]. Spectral Networks and Locally Connected Networks on Graphs, https://arxiv.org/abs/1312.6203
 
-[6].
+[6]. Convolutional neural networks on graphs with fast localized spectral filtering, https://papers.nips.cc/paper/6081-convolutional-neural-networks-on-graphs-with-fast-localized-spectral-filtering
 
-[7].
+[7]. 
 
 [8]. 如何通俗易懂地解释卷积, https://www.zhihu.com/question/22298352
 
