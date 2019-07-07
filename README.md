@@ -319,8 +319,9 @@ $$\mathbf{h}_{v}^{l+1}=U_{l+1}(\mathbf{h}_v,\sum_{u{\in}ne[v]}M_{l+1}(\mathbf{h}
 
 MPNN很好地概括了空域卷积的过程，但定义在这个框架下的所有模型都有一个共同的缺陷：空域卷积的输入是整张图，也就意味着要将所有结点放入内存中，才能进行在图上的卷积操作。对许多实际场景中应用的大规模的图而言，这样的操作并不现实。GraphSage[2]提出的动机之一就是解决这个问题。从该方法的名字我们也能看出，区别于传统的整图卷积，GraphSage使用**采样**(Sample)部分结点进行学习。当然，即使不需要整张图同时卷积，GraphSage仍然需要聚合邻居结点的信息，即论文中定义的*aggregate*的操作。这种操作类似于MPNN中的**消息传递**过程。最终，GraphSage的状态更新公式如下：
 
-$$\mathbf{h}_{v}^{l+1}=\sigma(\mathbf{W}^{l+1}\cdot(\mathbf{h}_v^l,\{\mathbf{h}_u^l\}),{\forall}u{\in}ne[v])$$
+$$\mathbf{h}_{v}^{l+1}=\sigma(\mathbf{W}^{l+1}\cdot aggregate(\mathbf{h}_v^l,\{\mathbf{h}_u^l\}),{\forall}u{\in}ne[v])$$
 
+这样的话，GraphSage的设计重点就放在了$aggregate$函数的设计上。它可以是不带参数的$max$, $mean$, 也可以是带参数的如$LSTM$等神经网络。核心的原则仍然是，它需要可以处理变长的数据。
 
 ## 频域卷积(Spectral Convolution)
 
