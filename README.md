@@ -344,7 +344,10 @@ PATCHY-SAN 通过以下三个步骤来解决这两个问题：
 2. **邻居选择(Neigbor selecting)**。在完成结点排序后，以第1步选择的结点为中心，得到它们的邻居(这里的邻居可以是第一阶邻居，也可以是二阶邻居)结点，就构成了 $\omega$ 个团。根据第1步得到的结点排序对每个团中的邻居结点进行排序，再取前 $k$ 个邻居结点按照顺序排列，组成若干个序列。
 3. **卷积(Convolutional Neural Network)**。按照上述做法，即可将图结构转换成有序的序列结构。我们就可以直接使用卷积神经网络对该序列建模，例如可以对图进行分类。
 
-值得注意的一点是，在取不到 $\omega$ 或 $k$ 个结点时，都会使用空结点作填充(padding)。
+一个形象的流程图如下所示。值得注意的一点是，在取不到 $\omega$ 或 $k$ 个结点时，都会使用空结点作填充(padding)。
+
+![Pathcy-san framework](https://raw.githubusercontent.com/SivilTaram/Graph-Neural-Network-Note/master/images/image-14-pathcy-san-framework.png)
+
 
 ## 频域卷积(Spectral Convolution)
 
