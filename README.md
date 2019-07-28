@@ -340,16 +340,55 @@ GraphSage的设计重点就放在了$aggregate$函数的设计上。它可以是
 
 PATCHY-SAN 通过以下三个步骤来解决这两个问题：
 
-1. **结点排序(Node Ranking)**。该过程旨在与通过一些人为定义的规则(如度大的结点分数很高，邻居的度大时分数较高等)为每个结点指定一个在图中的排序。然后取出前 $\omega$个结点代表整张图。
-2. **邻居选择(Neigbor selecting)**。在完成结点排序后，以第1步选择的结点为中心，得到它们的邻居(这里的邻居可以是第一阶邻居，也可以是二阶邻居)结点，就构成了 $\omega$ 个团。根据第1步得到的结点排序对每个团中的邻居结点进行排序，再取前 $k$ 个邻居结点按照顺序排列，组成若干个序列。
-3. **卷积(Convolutional Neural Network)**。按照上述做法，即可将图结构转换成有序的序列结构。我们就可以直接使用卷积神经网络对该序列建模，例如可以对图进行分类。
+1. **结点选择(Node Squenece Selection)**。该过程旨在与通过一些人为定义的规则(如度大的结点分数很高，邻居的度大时分数较高等)为每个结点指定一个在图中的排序。在完成排序后，取出前 $\omega$ 个结点作为整个图的代表。
+2. **邻居结点构造(Neighborhood graph construction)**。在完成结点排序后，以第1步选择的结点为中心，得到它们的邻居(这里的邻居可以是第一阶邻居，也可以是二阶邻居)结点，就构成了 $\omega$ 个团。根据第1步得到的结点排序对每个团中的邻居结点进行排序，再取前 $k$ 个邻居结点按照顺序排列，即组成 $\omega$ 个有序的团。
+3. **图规范化(Graph Noermalization)**。按照每个团中的结点顺序可将所有团转换成固定长度的序列($k+1$)，再将它们按照中心结点的排序从前到后依次拼接，即可得到一个长度为 ${\omega}*(k+1)$ 的代表整张图的序列。这样，我们就可以直接使用带1D的卷积神经网络对该序列建模，比如图分类(可类比文本序列分类)。值得注意的一点是，在第1步和第2步中，如果取不到 $\omega$ 或 $k$ 个结点时，要使用空结点作填充(padding)。
 
-一个形象的流程图如下所示。值得注意的一点是，在取不到 $\omega$ 或 $k$ 个结点时，都会使用空结点作填充(padding)。
+一个形象的流程图如下所示，图源自论文[4]。
 
 ![Pathcy-san framework](https://raw.githubusercontent.com/SivilTaram/Graph-Neural-Network-Note/master/images/image-14-pathcy-san-framework.png)
 
+下图可能可以帮助读者更好地理解这种算法，图来自[12]。整个流程自底向上：首先根据自定义规则对图里的结点进行排序，然后选择前6个结点，即图中的 1至6；接着我们把这些结点
+
+![Patchy-san 具体样例](https://raw.githubusercontent.com/SivilTaram/Graph-Neural-Network-Note/master/images/image-15-pathcy-san-detail.png)
 
 ## 频域卷积(Spectral Convolution)
+
+空域卷积非常直观地借鉴了图像里的卷积操作，但据笔者的了解，它缺乏一定的理论基础。而频域卷积则不同，相比于空域卷积而言，它主要利用的是**图傅里叶变换(Graph Fourier Transform)**实现卷积。简单来讲，它利用图的**拉普拉斯矩阵(Laplacian matrix)**导出其频域上的的拉普拉斯算子，再类比频域上的欧式空间中的卷积，导出图卷积的公式。虽然公式的形式与空域卷积非常相似，但频域卷积的推导过程却有些艰深晦涩。接下来我们将攻克这部分看起来很难的数学公式，主要涉及到**傅里叶变换(Fourier Transform)**和**拉普拉斯算子(Laplacian operator)**。即使读者没有学过任何相关知识也不要紧，笔者将尽可能用形象的描述解释每个公式的涵义，让读者能感悟这些公式的美妙之处。
+
+### 前置内容
+
+如上所述，在本小节，我们将介绍两个主要的知识点：傅里叶变换与拉普拉斯算子。在介绍之前，我们先抛出两个问题：1. 什么是傅里叶变换; 2. 如何将傅里叶变换扩展到图结构上。这两个问题是前置内容部分要解决的核心问题，读者可带着这两个问题，完成下面内容的阅读。
+
+#### 傅里叶变换(Fourier Transform)
+
+借用维基百科的说法，**傅里叶变换(Fourier Transform, FT)**会将一个在空域(或时域)上定义的函数分解成频域上的若干频率成分。换句话说，傅里叶变换可以将一个函数从空域变到频域。先抛开傅里叶变换的数学公式不谈，用 $F$ 来表示傅里叶变换的话，我们先讲一个很重要的恒等式：
+
+$$(f*g)(t)=F^{-1}[F[f(t)]{\bigodot}F[g(t)]]$$
+
+这里的$F^{-1}$指的是傅里叶逆变换，$\bigodot$是哈达玛乘积，指的是两个矩阵(或向量)的**逐点乘积(Element-wise Multiplication)**。仔细观察上面这个公式，它的直观含义可以用一句话来概括：*空(时)域卷积等于频域乘积*。简单来说就是，如果要算 $f$ 与 $g$ 的卷积，可以先将它们通过傅里叶变换变换到频域中，将两个函数在频域中相乘，然后再通过傅里叶逆变换转换出来，就可以得到 $f$ 与 $g$ 的卷积结果。下面的动图形象地展示了傅里叶变换的过程，这里我们把函数 $f$ 傅里叶变换后的结果写作 $\hat{f}$.
+
+![傅里叶变换的示例](https://raw.githubusercontent.com/SivilTaram/Graph-Neural-Network-Note/master/images/image-15-ft-example.gif)
+
+那傅里叶变换能干啥呢，有一个简单的应用是给图像去除一些规律噪点。比如说下面这个例子，原图来自知乎 [13]。
+
+在傅里叶变换前，图像上有一些规律的条纹，直接在原图上去掉条纹有点困难，但我们可以将图片通过傅里叶变换变到频谱图中，频谱图中那些规律的点就是原图中的背景条纹。
+
+![傅里叶变换的示例](https://raw.githubusercontent.com/SivilTaram/Graph-Neural-Network-Note/master/images/image-16-ft-transoform-before.jpg)
+
+只要在频谱图中擦除这些点，就可以将背景条纹去掉，得到下图右侧的结果。
+
+![傅里叶变换的示例](https://raw.githubusercontent.com/SivilTaram/Graph-Neural-Network-Note/master/images/image-17-ft-transoform-after.jpg)
+
+除了可以用来分离噪声点与正常点，傅里叶变换还凭借上面的恒等式，在加速卷积运算方面有很大的潜力，**快速傅里叶变换(Fast Fourier Transform)**也是由此而生。实际上呢，现在大家最常用的卷积神经网络，完全可以搭配傅里叶变换。下面这张图就表示了一个普通的卷积神经网络如何与傅里叶变换搭配，其中的 IFFT 即 **快速傅里叶变换的逆变换(Inverse Fast Fourier Transform**：
+
+![傅里叶变换的示例](https://raw.githubusercontent.com/SivilTaram/Graph-Neural-Network-Note/master/images/image-18-ft-cnn-example.png)
+
+其实笔者在初识傅里叶变换时很好奇，既然FFT可以加速卷积神经网络，为什么现在的卷积神经网络不用呢? 在经过一些搜索与思考后，笔者将自己得到的结论抛砖引玉供读者参考：我们现在的卷积神经网络的核都很小，常见的都如1，3，5之类，卷积操作的时间开销本来就不大。如果要搭配FFT，还需要做傅里叶变换与逆变换，时间开销并不一定会减小。
+
+说了这么半天，傅里叶变换的公式是什么样呢？实际上，$f$经过傅里叶变换后的结果$\hat{f}$就如下所示，其中 $i=\square{-1}$，$\omega$是频率相位。
+
+$$\hat{f}(t)={\int}f(x){\exp}^{-i{\omega}t}dx$$
 
 ## 参考文献
 
@@ -365,7 +404,7 @@ PATCHY-SAN 通过以下三个步骤来解决这两个问题：
 
 [6]. Convolutional neural networks on graphs with fast localized spectral filtering, https://papers.nips.cc/paper/6081-convolutional-neural-networks-on-graphs-with-fast-localized-spectral-filtering
 
-[7]. 
+[7]. Semi-Supervised Classification with Graph Convolutional Networks, https://arxiv.org/pdf/1609.02907
 
 [8]. 如何通俗易懂地解释卷积, https://www.zhihu.com/question/22298352
 
@@ -374,7 +413,10 @@ PATCHY-SAN 通过以下三个步骤来解决这两个问题：
 [10]. https://mlnotebook.github.io/post/CNN1/
 
 [11]. http://snap.stanford.edu/proj/embeddings-www
-<!-- ---
+
+[12]. https://zhuanlan.zhihu.com/p/37840709
+
+[13]. https://www.zhihu.com/question/20460630/answer/105888045
 
 在上篇博客中我们仔细介绍了
 
