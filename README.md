@@ -412,9 +412,9 @@ $$∆{\exp}^{-2{\pi}ixt}=\frac{{\partial}^2}{{\partial}t^2}{\exp}^{-2{\pi}ixt}={
 
 聪明的研究者们找到了图的**拉普拉斯矩阵(L)**及其**特征向量($u$)**，作为上述两者的替代品。至此，形成了图上傅里叶变换的生态系统。拉普拉斯矩阵，实际上是**度矩阵(D)**减去**邻接矩阵(A)** $L=D-A$，如下图所示，图源自[14].
 
-![拉普拉斯矩阵](https://raw.githubusercontent.com/SivilTaram/Graph-Neural-Network-Note/master/images/image-19-graph-laplacian-matrix)
+![拉普拉斯矩阵](https://raw.githubusercontent.com/SivilTaram/Graph-Neural-Network-Note/master/images/image-19-graph-laplacian-matrix.png)
 
-频域卷积的前提条件是图必须是无向图，那么$L$就是对称矩阵，所以它可以按照如下公式分解:
+频域卷积的前提条件是图必须是无向图，那么$L$就是对称矩阵。所以它可以按照如下公式分解:
 
 $$L = U{\Lambda}U^{T}$$
 $$U = (u_1, u_2,{\cdots},u_n)$$
@@ -444,11 +444,47 @@ $$
 $$(f*g)=F^{-1}[F[f]{\odot}F[g]]$$
 $$(f{*}_{G}g)=U(U^Tf{\odot}U^Tg)=U(U^Tg{\odot}U^Tf)$$
 
-如果把 $U^Tg$ 整体看作可学习的卷积核，这里我们把它写作 $g_{\theta}$。最终的卷积公式即：
+如果把 $U^Tg$ 整体看作可学习的卷积核，这里我们把它写作 $g_{\theta}$。最终图上的卷积公式即是：
 
 $$
-o = (f*_{G}g)_{\theta}
+o = (f*_{G}g)_{\theta} = Ug_{\theta}U^Tf
 $$
+
+接下来我们要介绍的图上频域卷积的工作，都是在$g_{\theta}$的基础上做文章。
+
+### 频域卷积网络(Spectral CNN)
+
+我们上面推导的这个 $g_{\theta}$ 就是首个提出的频域卷积神经网络的卷积核[15]。假设$l$层的隐藏状态为$h^l{\in}{R}^{N{\times}d_l}$，类似地，第$l+1$层为$h^{l+1}{\in}{R}^{N{\times}d_{l+1}}$。频域卷积层的状态更新计算公式如下：
+
+$$
+h^{l+1}_{:,j}={\sigma}(U{\sum}_{i=1}^{d_l}{\Theta}^l_{i,j}U^Th^l_{:,i})
+$$
+ 
+
+$${\Theta}^l_{i,j}=g_{\theta}=
+\left[
+ \begin{matrix}
+   {\theta}_1 & ... & 0 \\
+   ... & ... & ... \\
+   0  & ... & {\theta}_N \end{matrix}
+  \right]
+$$
+
+仔细观察上式，可以发现一层卷积层参数有 $N{\times}d_l{\times}d_{l+1}$个。这里的${\Theta}^l_{i,j}$其实可以类比全连接神经网络中的权重$w_{i,j}$，为了方便读者理解，笔者做了下面的示意图：
+
+![示意图](https://raw.githubusercontent.com/SivilTaram/Graph-Neural-Network-Note/master/images/image-20-graph-spectral-network.png)
+
+### 切比雪夫网络(ChebNet)
+
+基本的频域卷积网络要计算拉普拉斯矩阵所有的特征值和特征向量，计算量巨大。在论文[16]中提出了切比雪夫网络，它应用**切比雪夫多项式(Chebyshev polynomials)**来加速特征矩阵的求解。假设切比雪夫多项式的第k项是 $T_{k}$, 频域卷积核的计算方式如下：
+
+> 切比雪夫多项式是以递归方式定义的一系列正交多项式序列。
+$$
+g_{\theta}={\sum}_{k=0}^{K-1}{\theta}_{k}T_{k}(\tilde{\Lambda}), \text{where}\ \tilde{\Lambda}=\displaystyle\frac{2\Lambda}{\lambda_{max}}-I_N
+$$
+
+那么$T_k$ 怎么来呢，可以由切比雪夫多项式的定义得来:$T_k(x)=2xT_{k-1}(x)-T_{k-2}(x)$，递推式的前两项为$T_0(x)=1$以及$T_1(x)=x$。$\tilde{\Lambda}$的作用是让特征向量矩阵归一化到$[-1,1]$之间。
+
 
 ## 参考文献
 
@@ -479,6 +515,11 @@ $$
 [13]. https://www.zhihu.com/question/20460630/answer/105888045
 
 [14]. https://en.wikipedia.org/wiki/Laplacian_matrix
+
+[15]. Spectral Networks and Locally Connected Networks on Graphs
+, https://arxiv.org/abs/1312.6203
+
+[16]. Convolutional neural networks on graphs with fast localized spectral filtering, https://arxiv.org/abs/1606.09375
 
 ---
 
