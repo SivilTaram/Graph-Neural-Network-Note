@@ -571,15 +571,32 @@ $$\textbf{h}_𝐺=FC(\textbf{H}^𝐿)$$
 
 ### 可微池化(Differentiable Pooling)
 
-上面两种方法都比较简单，不会**层次化**地去获得图的表示。所以在论文[2]中，作者提出了一种层次化的图表示，而这则依赖于他们所提出的**可微池化(Differentiable Pooling)**技术。简单来讲，它不希望各个结点一次性得到图的表示，而是希望通过一个逐渐压缩信息的过程，来得到最终图的表示，如下图所示：
+上面两种方法都比较简单，不会**层次化**地去获得图的表示。所以在论文[2]中，作者提出了一种层次化的图表示，而这则依赖于他们所提出的**可微池化(Differentiable Pooling, DiffPool)**技术。简单来讲，它不希望各个结点一次性得到图的表示，而是希望通过一个逐渐压缩信息的过程，来得到最终图的表示，如下图所示：
 
 ![可微池化](https://raw.githubusercontent.com/SivilTaram/Graph-Neural-Network-Note/master/images/image-24-diff-pool.png)
 
+相比于一般先通过GCN得到所有结点表示(**H^l**)，再通过方法汇总得到图的最终表示的方法，DiffPool则同时完成了两个任务：**结点聚类(Soft Clustering)**与**结点表示(Node Representation)**。这两个任务是由两个不共享参数的GCN模块分别完成的，下文用 SC 和 NR 分别表示这两个模块。NR 模块与传统的GCN一样，输入是各结点的隐藏状态，通过图上的传播，输出是传播后各个结点的表示。SC 模块则不同，它的输入虽然也是各结点的隐藏表示，但其输出的是各结点属于不同聚类簇的概率(注意这里每一层聚类簇的数目是预先定义的)。上图中最左侧每个结点右上方的表格即代表这个。举个例子，假设本层子图有6个结点，将各个结点输出的簇分类概率堆叠在一起，即可得到矩阵$\textbf{S}^l$，如下图所示(蓝色，橙色和绿色分别代表三个聚类簇。在实际中，聚类矩阵不是离散变量，而是连续变量。)：
 
+![结点聚类](https://raw.githubusercontent.com/SivilTaram/Graph-Neural-Network-Note/master/images/image-25-soft-cluster.png)
 
+以$\textbf{A}^l$表示第$l$层子图结点的邻接关系，$\textbf{A}^0$即是图的邻接矩阵，$N_l$表示第$l$层子图结点的个数，$\textbf{H}^l$表示第$l$层子图各个结点表示堆叠而成的隐状态矩阵，DiffPool通过如下公式得到新子图中各个结点的表示：
+
+$$\textbf{S}^l=SC(\textbf{A}^l,\textbf{H}^l), 其中 \textbf{S}^l{\in}\mathbb{R}^{(N_l×N_{l+1})}$$
+
+$$\tilde{\textbf{H}}^l = NR (\textbf{A}^l,\textbf{H}^l)$$
+
+$$\textbf{H}^{l+1}=(\textbf{S}^l)^T\tilde{\textbf{H}}^l$$
+
+除了各个结点的表示外，还有一个很重要的事情是生成新子图$\textbf{A}^{l+1}$的邻接关系：
+
+$$\textbf{A}^{l+1}=(\textbf{S}^l)^T{\textbf{A}^l}\textbf{S}^l$$
+
+### 其他方法
+
+还有一些其他方法，就如前文所提到的 PATCHY-SAN，通过基于规则的方法对图进行排序，将图排成序列，然后使用类似于CNN做文本分类的方法，使用1-D Pooling都得到图表示。
 
 ## 参考文献
 
 [1]. Molecular graph convolutions moving beyond fingerprints, https://arxiv.org/abs/1603.00856
 
-[2]. Hierarchical Graph Representation Learning with Differentiable Pooling
+[2]. Hierarchical Graph Representation Learning with Differentiable Pooling, https://arxiv.org/abs/1806.08804
