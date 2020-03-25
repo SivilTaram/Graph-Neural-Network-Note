@@ -6,7 +6,7 @@
 
 因此，本文试图沿着图神经网络的历史脉络，从最早基于不动点理论的**图神经网络**(Graph Neural Network， GNN)一步步讲到当前用得最火的**图卷积神经网络**(Graph Convolutional Neural Network， GCN)， 期望通过本文带给读者一些灵感与启示。
 
-- 本文的提纲与叙述要点主要参考了2篇图神经网络的Survey，分别是来自IEEE Fellow的*A Comprehensive Survey on Graph Neural Networks*[1] 以及来自清华大学朱文武老师组的*Deep Learning on Graphs: A Survey*[7]， 在这里向两篇Survey的作者表示敬意。
+- 本文的提纲与叙述要点主要参考了3篇图神经网络的Survey，分别是来自IEEE Fellow的*A Comprehensive Survey on Graph Neural Networks*[1]，来自清华大学朱文武老师组的*Deep Learning on Graphs: A Survey*[7]，以及来自清华大学孙茂松老师组的*Graph Neural Networks: A Review of Methods and Applications*[14], 在这里向三篇Survey的作者表示敬意。
 - 同时，本文关于部分图卷积神经网络的**理解**很多都是受到知乎问题[8]高赞答案的启发，非常感谢他们的无私分享！
 - 最后，本文还引用了一些来自互联网的生动形象的图片，在这里也向这些图片的作者表示感谢。本文中未注明出处的图片均为笔者制作，如需转载或引用请联系本人。
 
@@ -22,7 +22,7 @@
 
 ## 图神经网络(Graph Neural Network)
 
-首先要澄清一点，除非特别指明，本文中所提到的图均指**图论中的图**(Graph)。它是一种由若干个**结点**(Node)及连接两个结点的**边**(Edge)所构成的图形，用于刻画不同结点之间的关系。下面是一个生动的例子，图片来自论文[7]:
+首先要澄清一点，除非特别指明，本文中所提到的图均指**图论中的图**(Graph)。它是一种由若干个**结点**(Node)及连接两个结点的**边**(Edge)所构成的图形，用于刻画不同结点之间的关系。下面是一个生动的例子，图片来自论文[14]:
 
 ![图像与图示例](https://raw.githubusercontent.com/SivilTaram/Graph-Neural-Network-Note/master/images/image-1-image-and-graph.png)
 
@@ -226,6 +226,8 @@ GGNN目前得到了广泛的应用，相比于GNN，其最大的区别在于不�
 [12]. Spider1.0 Yale Semantic Parsing and Text-to-SQL Challenge, https://yale-lily.github.io/spider
 
 [13]. https://www.wikiwand.com/en/Laplacian_matrix
+
+[14]. Graph Neural Networks: A Review of Methods and Applications, https://arxiv.org/pdf/1812.08434
 
 ---
 
